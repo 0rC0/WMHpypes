@@ -46,16 +46,22 @@ Classifier Options:
 #####################################################################################################################################
 @author: mdadar
 """
+# import joblib
 
-#import joblib
 
-def doPreprocessing(path_nlin_mask,path_Temp, ID_Test, WMH_Files_Test , wmh, T1_Files_Test , t1 , T2_Files_Test , t2 , PD_Files_Test , pd , FLAIR_Files_Test , flair ,  path_av_t1 , path_av_t2 , path_av_pd , path_av_flair):
+def doPreprocessing(path_nlin_mask,path_Temp, ID_Test,
+                    WMH_Files_Test , wmh,
+                    T1_Files_Test , t1 ,
+                    T2_Files_Test , t2 ,
+                    PD_Files_Test , pd ,
+                    FLAIR_Files_Test , flair ,
+                    path_av_t1 , path_av_t2 , path_av_pd , path_av_flair):
     import os
 
     nlmf = 'Y'
     nuf = 'Y'
     volpolf = 'Y'
-    if '.nii' in T1_Files_Test[0]: 
+    if '.nii' in T1_Files_Test[0]:
         fileFormat = 'nii'
     else:
         fileFormat = 'mnc'
@@ -75,7 +81,7 @@ def doPreprocessing(path_nlin_mask,path_Temp, ID_Test, WMH_Files_Test , wmh, T1_
                 new_command = 'cp ' + str_File_t1 + ' ' + path_Temp + str(ID_Test[i]) + '_T1.mnc'
             print('Executing: {}'.format(new_command))
             os.system(new_command)
-            new_command = '/bestlinreg_s2 ' +  path_Temp + str(ID_Test[i]) + '_T1.mnc ' +  path_av_t1 + ' ' +  path_Temp + str(ID_Test[i]) + '_T1toTemplate.xfm'
+            new_command = 'bestlinreg_s2 ' +  path_Temp + str(ID_Test[i]) + '_T1.mnc ' +  path_av_t1 + ' ' +  path_Temp + str(ID_Test[i]) + '_T1toTemplate.xfm'
             print('Executing: {}'.format(new_command))
             os.system(new_command)
             new_command = 'mincresample ' +  path_nlin_mask + ' -transform ' +  path_Temp + str(ID_Test[i]) + '_T1toTemplate.xfm' + ' ' +  path_Temp + str(ID_Test[i]) + '_T1_Mask.mnc -invert_transform -like ' + path_Temp + str(ID_Test[i]) + '_T1.mnc -nearest -clobber'
@@ -90,8 +96,7 @@ def doPreprocessing(path_nlin_mask,path_Temp, ID_Test, WMH_Files_Test , wmh, T1_
                 str_t1_proc = path_Temp + str(ID_Test[i]) + '_T1_NLM.mnc'
                 str_main_modality = str_t1_proc
             if (nuf == 'Y'):
-                new_command = 'nu_correct ' + path_Temp + str(ID_Test[i]) + '_T1_NLM.mnc '  + path_Temp + str(ID_Test[i]) + '_T1_N3.mnc -iter 200 -distance 50 -clobber'
-                #-mask '+ path_Temp + str(ID_Test[i]) + '_T1_Mask.mnc
+                new_command = 'nu_correct ' + path_Temp + str(ID_Test[i]) + '_T1_NLM.mnc '  + path_Temp + str(ID_Test[i]) + '_T1_N3.mnc -iter 200 -distance 50 -clobber -mask ' + path_Temp + str(ID_Test[i]) + '_T1_Mask.mnc'
                 print('Executing: {}'.format(new_command))
                 os.system(new_command)
                 str_t1_proc = path_Temp + str(ID_Test[i]) + '_T1_N3.mnc'
@@ -105,7 +110,7 @@ def doPreprocessing(path_nlin_mask,path_Temp, ID_Test, WMH_Files_Test , wmh, T1_
                 os.system(new_command)
                 str_t1_proc = path_Temp + str(ID_Test[i]) + '_T1_VP.mnc'
                 str_main_modality = str_t1_proc
-                
+
             new_command = 'bestlinreg_s2 ' +  str_t1_proc + ' ' +  path_av_t1 + ' ' +  path_Temp + str(ID_Test[i]) + '_T1toTemplate_pp_lin.xfm'
             print('Executing: {}'.format(new_command))
             os.system(new_command)
@@ -231,8 +236,10 @@ def doPreprocessing(path_nlin_mask,path_Temp, ID_Test, WMH_Files_Test , wmh, T1_
         
         if ((str_t1_proc != str_main_modality) & (t1 != '')):
             new_command = 'bestlinreg_s2 -lsq6 ' +  str_t1_proc + ' '  +  str_main_modality + ' ' +  path_Temp + str(ID_Test[i]) + '_T1toMain.xfm  -source_mask ' + path_Temp + str(ID_Test[i]) + '_T1_Mask.mnc -clobber'
+            print('Executing: {}'.format(new_command))
             os.system(new_command)
             new_command = 'mincresample ' +  str_t1_proc + ' -transform ' +  path_Temp + str(ID_Test[i]) + '_T1toMain.xfm' + ' ' +  path_Temp + str(ID_Test[i]) + '_T1_CR.mnc -like ' + str_main_modality + ' -clobber'
+            print('Executing: {}'.format(new_command))
             os.system(new_command)
             str_t1_proc =  path_Temp + str(ID_Test[i]) + '_T1_CR.mnc'        
                                    
@@ -253,11 +260,14 @@ def doPreprocessing(path_nlin_mask,path_Temp, ID_Test, WMH_Files_Test , wmh, T1_
             
         if (str_t1_proc != str_main_modality):
             new_command = 'xfminvert ' + path_Temp + str(ID_Test[i]) + '_T1toMain.xfm ' + path_Temp + str(ID_Test[i]) + '_inv_T1toMain.xfm -clobber'
+            print('Executing: {}'.format(new_command))
             os.system(new_command)
             new_command = 'xfmconcat ' + path_Temp + str(ID_Test[i]) + '_T1toTemplate_pp_both.xfm ' + path_Temp + str(ID_Test[i]) + '_inv_T1toMain.xfm '+ path_Temp + str(ID_Test[i]) + '_MaintoTemplate.xfm -clobber'
+            print('Executing: {}'.format(new_command))
             os.system(new_command)
             new_command = 'mincresample ' +  path_nlin_mask + ' -transform ' + path_Temp + str(ID_Test[i]) + '_MaintoTemplate.xfm' + ' ' +  path_Temp + str(ID_Test[i]) + '_Mask_nl.mnc -like ' + str_main_modality + ' -invert_transformation -nearest -clobber'
-            os.system(new_command) 
+            print('Executing: {}'.format(new_command))
+            os.system(new_command)
             str_Mask = path_Temp + str(ID_Test[i]) + '_Mask_nl.mnc'
             nl_xfm = path_Temp + str(ID_Test[i]) + '_MaintoTemplate.xfm'
             
