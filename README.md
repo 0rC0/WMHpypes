@@ -1,13 +1,10 @@
 # WMHpype
 Nipype based implementation of a WMH segmentation pipeline
 
-## Requirements
-* python2
-* scikit-learn <= 0.21 (`conda install scikit-learn=0.17`)
-* numpy
-* scipy  
-* minc-toolkit-v2 (`conda install -c bic-mni minc-toolkit-v2`)
-* pyezminc (`conda install -c vfonov pyezminc=1.2`)
+## Install
+* `conda create -n WMHpype scikit-learn=0.17.1 python=3.5 #` The old sklearn version is necessary because the pretrained classifier are made with that version
+* `pip install nipype nilearn`  
+* `conda install -c vfonov pyezminc=1.2`
 
 ## Example usage
 ```
