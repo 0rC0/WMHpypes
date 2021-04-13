@@ -1595,8 +1595,10 @@ def main(argv):
             WMT_auto[ind_WM] = Binary_Output[0 : N]
             out = minc.Image(data = WMT_auto)
             str_WMHo= path_output + Classifier + '_' + str_Test
+            print('save')
+            print(str_WMHo)
             out.save(name = str_WMHo + '_WMH.mnc', imitate = str_Mask)
-            
+            print('saved')
             Prob_auto = np.zeros(shape = (len(Mask) , len(Mask[0 , :]) , len(Mask[0 , 0 , :])))
             Prob_auto[ind_WM] = Prob_Output[0 : N,1]
             out = minc.Image(data = Prob_auto)

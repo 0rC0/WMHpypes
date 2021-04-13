@@ -75,7 +75,7 @@ class WMHpreproc:
         wmhpreproc.connect(t1_preproc, 'minccalc.output_file', resample, 'input_file')
         wmhpreproc.connect(bestlinereg_s2, 'output_xfm', resample, 'transform')
         wmhpreproc.connect(flair_preproc, 'minccalc.output_file', resample, 'like')
-
+        wmhpreproc.connect(resample, 'output_file', sink, '@t1_cr')
         return wmhpreproc
 
     def make_std_preprocessing_wf(self, templates_source, modality):
