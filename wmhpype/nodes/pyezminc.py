@@ -9,7 +9,8 @@ import os
 import os.path
 import re
 import warnings
-
+import sys
+from datetime import datetime
 from nipype.interfaces.base import (
     TraitedSpec,
     CommandLineInputSpec,
@@ -24,6 +25,21 @@ from nipype.interfaces.base import (
     isdefined,
 )
 
+sys.path = ['/home/anaconda3/envs/WMHpype/lib'] + sys.path
+
+# class Nii2MNCInputSpec(BaseInterfaceInputSpec):
+#     in_file = File(
+#         desc="input file for converting",
+#         exists=True,
+#         mandatory=True,
+#         argstr="%s",
+#     )
+#
+# class Nii2MNCOutputSpec(TraitedSpec):
+#      out_file = File(desc='output file', exists=True)
+#
+# class Nii2MNC(CommandLine):
+
 class Nii2MNCInputSpec(CommandLineInputSpec):
     in_file = File(
         desc="input file for converting",
@@ -33,10 +49,9 @@ class Nii2MNCInputSpec(CommandLineInputSpec):
     )
 
     out_file = File(
-        os.path.join(os.getcwd(),'T1.mnc'),
         desc="output file",
         argstr="%s",
-        usedefault=True,
+        mandatory=True,
     )
 
     quiet = traits.Bool(
@@ -59,17 +74,16 @@ class Nii2MNC(CommandLine):
     """
     input_spec = Nii2MNCInputSpec
     output_spec = Nii2MNCOutputSpec
+    os.environ['LD_LIBRARY_PATH']='/home/anaconda3/envs/WMHpype/lib:' + os.environ['LD_LIBRARY_PATH']
+    environ = dict(os.environ)
     _cmd = 'nii2mnc'
+    print(sys.path)
 
     def _list_outputs(self):
         outputs = self._outputs().get()
-        outputs['out_file'] = self._gen_filename('_conv')
+        outputs['out_file'] = os.path.join(os.getcwd(),
+                                           os.path.basename(self.inputs.out_file))
         return outputs
-
-    def _gen_filename(self, suffix):
-        return os.path.join(os.getcwd(), os.basename(self.inputs.out_file))
-
-
 
 class BestLinRegS2InputSpec(CommandLineInputSpec):
     source = File(
@@ -78,6 +92,10 @@ class BestLinRegS2InputSpec(CommandLineInputSpec):
 
     target = File(
         desc="target Minc file", exists=True, mandatory=True, argstr="%s", position=-3
+    )
+
+    source_mask = File(
+        desc="source mask to use during fitting", exists=True, mandatory=True, argstr="-source_mask %s"
     )
 
     output_xfm = File(
@@ -111,7 +129,7 @@ class BestLinRegS2InputSpec(CommandLineInputSpec):
         usedefault=True,
         default_value=True,
     )
-    verbose = traits.Bool(
+    lsq6 = traits.Bool(
         desc="use 6-parameter transformation", argstr="-lsq6"
     )
 
@@ -148,7 +166,10 @@ class BestLinRegS2(CommandLine):
 
     input_spec = BestLinRegS2InputSpec
     output_spec = BestLinRegS2OutputSpec
+    os.environ['LD_LIBRARY_PATH']='/home/anaconda3/envs/WMHpype/lib:' + os.environ['LD_LIBRARY_PATH']
+    environ = dict(os.environ)
     _cmd = "bestlinreg_s2"
+    print(sys.path)
 
 class MincNLMInputSpec(CommandLineInputSpec):
     in_file = File(
@@ -156,7 +177,9 @@ class MincNLMInputSpec(CommandLineInputSpec):
     )
 
     out_file = File(
-        desc="source Minc file", argstr="%s"
+        desc="source Minc file",
+        mandatory=True,
+        argstr="%s"
     )
 
     verbose = traits.Bool(
@@ -194,7 +217,14 @@ class MincNLMOutputSpec(TraitedSpec):
 class MincNLM(CommandLine):
     input_spec = MincNLMInputSpec
     output_spec = MincNLMOutputSpec
+    os.environ['LD_LIBRARY_PATH']='/home/anaconda3/envs/WMHpype/lib:' + os.environ['LD_LIBRARY_PATH']
+    environ = dict(os.environ)
     _cmd = 'mincnlm'
+    def _list_outputs(self):
+        outputs = self._outputs().get()
+        outputs['out_file'] = os.path.join(os.getcwd(),
+                                           os.path.basename(self.inputs.out_file))
+        return outputs
 
 class NUCorrectInputSpec(StdOutCommandLineInputSpec):
     # Implementation as freesurfer nu_correct
@@ -202,7 +232,7 @@ class NUCorrectInputSpec(StdOutCommandLineInputSpec):
         exists=True,
         mandatory=True,
         argstr="%s",
-        desc="input volume. Input can be any format accepted by mri_convert.",
+        desc="input volume",
     )
     # optional
     out_file = File(
@@ -242,6 +272,8 @@ class NUCorrectOutputSpec(TraitedSpec):
 class NUCorrect(CommandLine):
     input_spec = NUCorrectInputSpec
     output_spec = NUCorrectOutputSpec
+    os.environ['LD_LIBRARY_PATH']='/home/anaconda3/envs/WMHpype/lib:' + os.environ['LD_LIBRARY_PATH']
+    environ = dict(os.environ)
     _cmd = 'nu_correct'
 
 class VolumePolInputSpec(CommandLineInputSpec):
@@ -268,9 +300,8 @@ class VolumePolInputSpec(CommandLineInputSpec):
         argstr="--noclamp",
     )
     expfile = File(
-        exists=True,
         mandatory=True,
-        argstr="--expfile %s_T1_norm",
+        argstr="--expfile %s",
         desc="write output to the expression file ",
     )
     clobber = traits.Bool(
@@ -282,10 +313,75 @@ class VolumePolInputSpec(CommandLineInputSpec):
 
 
 class VolumePolOutputSpec(TraitedSpec):
-    out_file = File(desc="output file", exists=True)
+    expfile = File(desc="expfile", exists=True)
 
 
 class VolumePol(CommandLine):
     input_spec = VolumePolInputSpec
     output_spec = VolumePolOutputSpec
+    os.environ['LD_LIBRARY_PATH']='/home/anaconda3/envs/WMHpype/lib:' + os.environ['LD_LIBRARY_PATH']
+    environ = dict(os.environ)
     _cmd = 'volume_pol'
+    def _list_outputs(self):
+        outputs = self._outputs().get()
+        outputs['expfile'] = os.path.join(os.getcwd(),
+                                           os.path.basename(self.inputs.expfile))
+        return outputs
+
+
+class NLfitsInputSpec(CommandLineInputSpec):
+    source = File(
+        exists=True,
+        mandatory=True,
+        argstr="%s",
+        desc="source mnc",
+    )
+
+    target = File(
+        exists=True,
+        mandatory=True,
+        argstr="%s",
+        desc="target mnc",
+    )
+
+    out_xfm = File(
+        mandatory=True,
+        argstr="%s",
+        desc="output xfm",
+    )
+
+    out_mnc = File(
+        argstr="%s",
+        desc="output mnc",
+    )
+    level = traits.Int(
+        4,
+        usedefault=True,
+        argstr="-iter %d",
+        desc="Perform fitting down to step , minimum 0.5 [default: 4]",
+    )
+    clobber = traits.Bool(
+        desc="Overwrite existing file.",
+        argstr="-clobber"
+    )
+
+
+class NLfitsOutputSpec(TraitedSpec):
+    out_xfm = File(desc="output xfm", exists=True)
+    out_mnc = File(desc="output mnc", exists=True)
+
+
+class NLfits(CommandLine):
+    input_spec = NLfitsInputSpec
+    output_spec = NLfitsOutputSpec
+    os.environ['LD_LIBRARY_PATH']='/home/anaconda3/envs/WMHpype/lib:' + os.environ['LD_LIBRARY_PATH']
+    environ = dict(os.environ)
+    _cmd = 'nlfit_s'
+    def _list_outputs(self):
+        outputs = self._outputs().get()
+        outputs['out_xfm'] = os.path.join(os.getcwd(),
+                                           os.path.basename(self.inputs.out_xfm))
+        outputs['out_mnc'] = os.path.join(os.getcwd(),
+                                           os.path.basename(self.inputs.out_mnc))
+        return outputs
+
