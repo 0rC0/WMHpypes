@@ -132,4 +132,7 @@ dmypy.json
 test_data/
 
 #results
-*.npy
+*/*.npy
+
+#Pycharm project dir
+.idea
