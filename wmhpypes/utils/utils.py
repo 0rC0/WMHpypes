@@ -46,6 +46,7 @@ def dice_coef_loss(y_true, y_pred):
     return 1.-dice_coef_for_training(y_true, y_pred)
 
 def get_unet(img_shape=None, first5=True):
+
     inputs = Input(shape=img_shape)
     concat_axis = -1
 

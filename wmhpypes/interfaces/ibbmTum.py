@@ -54,9 +54,9 @@ class PreprocessingOutputSpec(TraitedSpec):
     )
 
     # ToDo: implement save npz
-    # flair_array_npz = File(
-    #     desc='preprocessed FLAIR as Numpy .npz'
-    # )
+    flair_array_npy = File(
+        desc='preprocessed FLAIR as Numpy .npz'
+    )
     #
     # two_modalities_npz = File(
     #     desc='preprocessed FLAIR and T1w concatenated as Numpy .npz'
@@ -66,7 +66,7 @@ class Preprocessing(BaseInterface):
     """
     Examples
     --------
-    >>> from wmh_ibbmTum_pypes.interfaces import ibbmTum
+    >>> from wmhpypes.interfaces import ibbmTum
     >>> preproc = ibbmTum.Preprocessing()
     >>> preproc.inputs.t1w = '../test_your_data_wmh/input_dir/T1.nii.gz'
     >>> preproc.inputs.flair = '../test_your_data_wmh/input_dir/FLAIR.nii.gz'
@@ -114,7 +114,9 @@ class Preprocessing(BaseInterface):
             imgs_test = self.preprocessing(FLAIR_array, T1_array)
         else:
             imgs_test = self.preprocessing(FLAIR_array)
-        np.save(os.path.join(os.getcwd(), 'preprocessed', imgs_test))
+        out_arr_name = os.path.join(os.getcwd(), 'preprocessed.npy')
+        np.save(out_arr_name, imgs_test)
+        setattr(self, '_flair_array_npy', out_arr_name)
         setattr(self, '_preprocessed_array', imgs_test)
         setattr(self, '_slice_shape', imgs_test[0].shape)
         return runtime
@@ -123,6 +125,7 @@ class Preprocessing(BaseInterface):
         outputs = self._outputs().get()
         outputs['preprocessed_array'] = getattr(self, '_preprocessed_array')
         outputs['slice_shape'] = getattr(self, '_slice_shape')
+        outputs['flair_array_npy'] = getattr(self, '_flair_array_npy')
         return outputs
 
 class PostprocessingInputSpec(BaseInterfaceInputSpec):
@@ -207,6 +210,10 @@ class PredictOutputSpec(TraitedSpec):
         desc='Prediction as array'
     )
 
+    prediction_npy = traits.File(
+        desc='Prediction as Numpy .npy'
+    )
+
 class Predict(BaseInterface):
 
     input_spec = PredictInputSpec
@@ -221,12 +228,17 @@ class Predict(BaseInterface):
             pred = model.predict(self.inputs.preprocessed_array, batch_size=1, verbose=1)
             p.append(pred)
         p_mean = np.array(p).mean(axis=0)
+
+        out_arr_name = os.path.join(os.getcwd(), 'prediction.npy')
+        np.save(out_arr_name, p_mean)
         setattr(self, '_prediction', p_mean)
+        setattr(self, '_prediction_npy', out_arr_name)
         return runtime
 
     def _list_outputs(self):
         outputs = self._outputs().get()
         outputs['prediction'] = getattr(self, '_prediction')
+        outputs['prediction_npy'] = getattr(self, '_prediction_npy')
         return outputs
 
 
