@@ -1,12 +1,15 @@
-# WMHpype
-Nipype based implementation of a WMH segmentation pipeline
+# WMHpypes
+Nipype implementation of WMH segmentation pipelines.
 
-## Install
-* `conda create -n WMHpype scikit-learn=0.17.1 python=3.5 #` The old sklearn version is necessary because the pretrained classifier are made with that version
-* `pip install nipype nilearn`  
-* `conda install -c vfonov pyezminc=1.2`
+## Interfaces
 
-## Example usage
+* ###  ibbmTum
+the winning method in MICCAI 2017 WMH segmentation challenge orginal work repository: ([wmh_ibbmTum](https://github.com/hongweilibran/wmh_ibbmTum))
+
+# Please cite
+If you use the package please cite the original author's [paper](https://arxiv.org/pdf/1802.05203.pdf):
+
+* ### ibbmTum
 ```
-python2 ./scripts/wmhsp.py -e PT -c RF -i test.csv -m ./MNI152_T1_1mm_brain_mask.mnc -o $PWD -t $PWD -p ./Trained_Classifiers/ -d Y -n test.csv
+Li, Hongwei & Jiang, Gongfa & Wang, Ruixuan & Zhang, Jianguo & Wang, Zhaolei & Zheng, Wei-Shi & Menze, Bjoern. (2018). Fully Convolutional Network Ensembles for White Matter Hyperintensities Segmentation in MR Images. NeuroImage. 183. 10.1016/j.neuroimage.2018.07.005. 
 ```
