@@ -15,14 +15,15 @@ def get_test_wf(row_st=200,
                 cols_st=200,
                 thres_mask=30,
                 per=0.125,
-                thres_pred=0.5):
+                thres_pred=0.5,
+                cores=os.cpu_count()):
 
     inputspec = Node(interface=IdentityInterface(fields=['t1w', 'flair', 'weights']), name='inputspec')
     preproc = Node(interface=Preprocessing(rows_standard=row_st,
                                            cols_standard=cols_st,
                                            thres=thres_mask), name='preprocessing')
     predict = Node(interface=Predict(), name='predict')
-    predict.interface.num_threads = os.cpu_count()
+    predict.interface._n_procs = cores
     thresholding = Node(interface=Thresholding(thres=thres_pred), name='thresholding')
     postproc = Node(interface=Postprocessing(rows_standard=row_st,
                                              cols_standard=cols_st,
