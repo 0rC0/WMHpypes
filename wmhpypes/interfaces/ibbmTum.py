@@ -250,7 +250,7 @@ class SavePredictionInputSpec(BaseInterfaceInputSpec):
     )
     output_filename = traits.Str(
         'prediction',
-        use_default=True,
+        usedefault=True,
         desc='output filename'
     )
 
@@ -277,7 +277,7 @@ class SavePrediction(BaseInterface):
         outputs['prediction_nifti'] = getattr(self, '_prediction_nii')
         return outputs
 
-class EsembleInputSpec(BaseInterfaceInputSpec):
+class EnsembleInputSpec(BaseInterfaceInputSpec):
 
     in_arrays = traits.List(
         traits.Array(),
@@ -285,16 +285,16 @@ class EsembleInputSpec(BaseInterfaceInputSpec):
         desc='Arrays list to esemble'
     )
 
-class EsembleOutputSpec(TraitedSpec):
+class EnsembleOutputSpec(TraitedSpec):
 
     out_array = traits.Array(
         desc='averaged array'
     )
 
-class Esemble(BaseInterface):
+class Ensemble(BaseInterface):
 
-    input_spec = EsembleInputSpec
-    output_spec = EsembleOutputSpec
+    input_spec = EnsembleInputSpec
+    output_spec = EnsembleOutputSpec
 
     def _run_interface(self, runtime):
 
@@ -334,7 +334,7 @@ class Thresholding(BaseInterface):
 
     def _run_interface(self, runtime):
 
-        out_arr = np.where(self.inputs.in_array>self.inputs.thres, 1, 0)
+        out_arr = np.where(self.inputs.in_array, self.inputs.thres, 1, 0)
         setattr(self, '_out_array', out_arr)
         return runtime
 
