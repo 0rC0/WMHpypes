@@ -8,7 +8,7 @@ from nipype.interfaces.io import BIDSDataGrabber
 from nipype.interfaces.utility import Function, Merge
 import os
 
-from ..interfaces.ibbmTum import Preprocessing, Predict, Postprocessing, SavePrediction, Esemble, Thresholding
+from ..interfaces.ibbmTum import Preprocessing, Predict, Postprocessing, SavePrediction, Ensemble, Thresholding
 
 
 def get_test_wf(row_st=200,
