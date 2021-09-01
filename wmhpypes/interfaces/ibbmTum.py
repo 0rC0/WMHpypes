@@ -342,3 +342,88 @@ class Thresholding(BaseInterface):
         outputs = self._outputs().get()
         outputs['out_array'] = getattr(self, '_out_array')
         return outputs
+
+class TrainInputSpec(BaseInterfaceInputSpec):
+
+    images = traits.Array(
+        mandatory=True,
+        desc='Images for the training as NumPy array'
+    )
+
+    masks = traits.Array(
+        mandatory=True,
+        desc='Masks for training as NumPy array'
+    )
+
+    model_path = traits.Directory(
+        mandatory=True,
+        desc='directory where to save the models'
+    )
+
+    ensemble_parameter = traits.Int(
+        3,
+        desc='ensemble parameter'
+    )
+
+    verbose = traits.Bool(
+        True,
+        usedefault=True,
+        desc='Verbose'
+    )
+
+    batch_size = traits.Int(
+        30,
+        usedefault=True,
+        desc='batch size, default 30'
+    )
+
+    epochs = traits.Int(
+        5,
+        usedefault=True,
+        desc='epochs, default 5'
+    )
+
+
+class TrainOutputSpec(TraitedSpec):
+
+    weights = traits.List(
+        File(exists=True,),
+        mandatory=True,
+        desc='Weights as list of H5 files')
+
+
+class Train(BaseInterface):
+
+    input_spec = TrainInputSpec
+    output_spec = TrainOutputSpec
+
+    def train(self):
+
+        model_name = 'model_'
+        models_list = list()
+    	for iiii in range(self.inputs.ensemble_parameter):
+            model_file=model_name + str(iiii) + '.h5'
+    		model = get_unet(img_shape)
+    		model_checkpoint = ModelCheckpoint(model_file,
+                                               save_best_only=False,
+                                               period = 2)
+    		model.fit(self.inputs.images,
+                      self.inputs.masks,
+                      batch_size=self.inputs.batch_size,
+                      nb_epoch= self.inputs.epochs,
+                      verbose=self.inputs.verbose,
+                      shuffle=True,
+                      validation_split=0.0,
+                      callbacks=[model_checkpoint])
+    		model.save(model_file)
+            models_list.append(os.path.join(os.getcwd(),model_file))
+        return models_list
+
+    def _run_interface(self, runtime):
+        weights = train()
+        setattr(self, '_weights', weights)
+
+    def _list_outputs(self):
+        outputs = self._outputs().get()
+        outputs['weights'] = getattr(self, '_weights')
+        return outputs
