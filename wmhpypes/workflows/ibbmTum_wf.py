@@ -2,12 +2,18 @@
 # emacs: -*- mode: python; py-indent-offset: 4; indent-tabs-mode: nil -*-
 # vi: set ft=python sts=4 ts=4 sw=4 et:
 
+# WMH Segmentation workflow
+# ==========================
+#
+# Exmple Usage:
+# =============
+#  ToDo
+
 from nipype.pipeline.engine import Workflow, Node
 from nipype import DataGrabber, DataSink, IdentityInterface, MapNode, JoinNode
 from nipype.interfaces.io import BIDSDataGrabber
 from nipype.interfaces.utility import Function, Merge
 import os
-
 from ..interfaces.ibbmTum import Preprocessing, Predict, Postprocessing, SavePrediction, Ensemble, Thresholding
 
 
@@ -23,7 +29,8 @@ def get_test_wf(row_st=200,
                                            cols_standard=cols_st,
                                            thres=thres_mask), name='preprocessing')
     predict = Node(interface=Predict(), name='predict')
-    predict.interface._n_procs = cores
+    predict.interface._nprocs = cores
+    predict.interface._memgb = 1
     thresholding = Node(interface=Thresholding(thres=thres_pred), name='thresholding')
     postproc = Node(interface=Postprocessing(rows_standard=row_st,
                                              cols_standard=cols_st,
@@ -44,4 +51,3 @@ def get_test_wf(row_st=200,
     test_wf.connect(save, 'prediction_nifti', outputspec, 'prediction_nifti')
 
     return test_wf
-
