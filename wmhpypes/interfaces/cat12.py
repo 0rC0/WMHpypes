@@ -27,11 +27,11 @@ class CAT12SANLMDenoisingInputSpec(SPMCommandInputSpec):
 
     v = traits.Int(3,
                    usedefault=True,
-                   desc = 'size of search volume (M in paper)')
+                   desc='size of search volume (M in paper)')
 
     f = traits.Int(1,
                    usedefault=True,
-                   desc = 'size of neighborhood (d in paper)')
+                   desc='size of neighborhood (d in paper)')
 
     rician = traits.Bool(0,
                          usedefault=True,
@@ -58,7 +58,8 @@ class CAT12SANLMDenoising(SPMCommand):
                              f = '$f';
                              rician = '$rician';
                              cat_sanlm(in_file, v, f, rician);
-        """)
+                             exit;
+        """).substitute(d)
         mlab = MatlabCommand(script=script, mfile=True)
         result = mlab.run()
         return result.runtime
