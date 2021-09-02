@@ -17,6 +17,7 @@ from keras.optimizers import Adam
 #from evaluation import getDSC, getHausdorff, getLesionDetection, getAVD, getImages
 
 
+
 def get_crop_shape(target, refer):
 
     # width, the 3rd dimension
@@ -41,6 +42,13 @@ def conv_bn_relu(nd, k=3, inputs=None):
     #bn = BatchNormalization()(conv)
     relu = Activation('relu')(conv)
     return relu
+
+def dice_coef_for_training(y_true, y_pred):
+    y_true_f = K.flatten(y_true)
+    y_pred_f = K.flatten(y_pred)
+    intersection = K.sum(y_true_f * y_pred_f)
+    return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+
 
 def dice_coef_loss(y_true, y_pred):
     return 1.-dice_coef_for_training(y_true, y_pred)
@@ -107,3 +115,24 @@ def get_unet(img_shape=None, first5=True):
     model.compile(optimizer=Adam(lr=(2e-4)), loss=dice_coef_loss)
 
     return model
+
+
+def augmentation(x_0, x_1, y):
+    theta = (np.random.uniform(-15, 15) * np.pi) / 180.
+    rotation_matrix = np.array([[np.cos(theta), -np.sin(theta), 0],
+                                [np.sin(theta), np.cos(theta), 0],
+                                [0, 0, 1]])
+    shear = np.random.uniform(-.1, .1)
+    shear_matrix = np.array([[1, -np.sin(shear), 0],
+                             [0, np.cos(shear), 0],
+                             [0, 0, 1]])
+    zx, zy = np.random.uniform(.9, 1.1, 2)
+    zoom_matrix = np.array([[zx, 0, 0],
+                            [0, zy, 0],
+                            [0, 0, 1]])
+    augmentation_matrix = np.dot(np.dot(rotation_matrix, shear_matrix), zoom_matrix)
+    transform_matrix = transform_matrix_offset_center(augmentation_matrix, x_0.shape[0], x_0.shape[1])
+    x_0 = apply_transform(x_0[..., np.newaxis], transform_matrix, channel_axis=2)
+    x_1 = apply_transform(x_1[..., np.newaxis], transform_matrix, channel_axis=2)
+    y = apply_transform(y[..., np.newaxis], transform_matrix, channel_axis=2)
+    return x_0[..., 0], x_1[..., 0], y[..., 0]
