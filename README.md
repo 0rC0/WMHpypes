@@ -7,10 +7,17 @@ Nipype implementation of WMH segmentation pipelines.
 the winning method in MICCAI 2017 WMH segmentation challenge orginal work repository: ([wmh_ibbmTum](https://github.com/hongweilibran/wmh_ibbmTum))
 
 
-## Installation and usage
+## Installation
 
-ToDo
+```
+git clone https://github.com/0rC0/WMHpypes.git
+cd WMHpypes
+pip install .
+```
 
+## Usage
+
+`ToDo`
 
 # Please cite
 If you use the package please cite the original author's [paper](https://arxiv.org/pdf/1802.05203.pdf):
