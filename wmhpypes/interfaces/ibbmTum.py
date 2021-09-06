@@ -334,7 +334,7 @@ class Thresholding(BaseInterface):
 
     def _run_interface(self, runtime):
 
-        out_arr = np.where(self.inputs.in_array, self.inputs.thres, 1, 0)
+        out_arr = np.where(self.inputs.in_array > self.inputs.thres, 1, 0)
         setattr(self, '_out_array', out_arr)
         return runtime
 
@@ -401,13 +401,13 @@ class Train(BaseInterface):
 
         model_name = 'model_'
         models_list = list()
-    	for iiii in range(self.inputs.ensemble_parameter):
+        for iiii in range(self.inputs.ensemble_parameter):
             model_file=model_name + str(iiii) + '.h5'
-    		model = get_unet(img_shape)
-    		model_checkpoint = ModelCheckpoint(model_file,
+            model = get_unet(img_shape)
+            model_checkpoint = ModelCheckpoint(model_file,
                                                save_best_only=False,
                                                period = 2)
-    		model.fit(self.inputs.images,
+            model.fit(self.inputs.images,
                       self.inputs.masks,
                       batch_size=self.inputs.batch_size,
                       nb_epoch= self.inputs.epochs,
@@ -415,7 +415,7 @@ class Train(BaseInterface):
                       shuffle=True,
                       validation_split=0.0,
                       callbacks=[model_checkpoint])
-    		model.save(model_file)
+            model.save(model_file)
             models_list.append(os.path.join(os.getcwd(),model_file))
         return models_list
 
