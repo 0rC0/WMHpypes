@@ -7,7 +7,22 @@
 #
 # Exmple Usage:
 # =============
-#  ToDo
+# from wmhpypes.workflows import ibbmTum_wf
+# from nipype.pipeline.engine import Workflow, Node
+
+# from nipype import IdentityInterface
+# test_wf = ibbmTum_wf.get_test_wf()
+# flair = Node(interface=IdentityInterface(fields=['flair']), name='flair')
+# flair.inputs.flair = os.path.abspath('./sub-test_FLAIR.nii')
+# weights = Node(interface=IdentityInterface(fields=['weights']), name='weights')
+# weights.inputs.weights = [os.path.abspath('./0.h5')]
+# sink = Node(interface=DataSink(), name ='sink')
+# sink.inputs.base_directory = './out'
+#
+# wmh = Workflow(name='wmh', base_dir='./wf')
+# wmh.connect(weights, 'weights', test_wf, 'inputspec.weights')
+# wmh.connect(flair, 'flair', test_wf, 'inputspec.flair')
+# wmh.run()
 
 from nipype.pipeline.engine import Workflow, Node
 from nipype import DataGrabber, DataSink, IdentityInterface, MapNode, JoinNode
