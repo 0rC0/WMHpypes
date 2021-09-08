@@ -5,14 +5,14 @@
 import tensorflow as tf
 from keras.models import Model
 from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, Cropping2D, ZeroPadding2D, BatchNormalization, Activation
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint
+#from keras.callbacks import ModelCheckpoint
 from keras import backend as K
 import scipy.spatial
 from keras.models import Model
 from keras.layers.merge import concatenate
 from keras.layers import Input, merge, Convolution2D, MaxPooling2D, UpSampling2D, Cropping2D, ZeroPadding2D
-from keras.optimizers import Adam
+from tensorflow.keras.optimizers import Adam
+#from keras.optimizers import Adam
 #from keras.preprocessing.image import apply_transform, transform_matrix_offset_center
 #from evaluation import getDSC, getHausdorff, getLesionDetection, getAVD, getImages
 
