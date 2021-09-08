@@ -18,22 +18,36 @@ from nipype.interfaces.base import (
     File,
     Str,
 )
-
+from nipype.interfaces.spm.base import (
+    SPMCommandInputSpec,
+    ImageFileSPM,
+    scans_for_fnames,
+    scans_for_fname,
+)
+from nipype.interfaces.cat12.base import Cell
 
 class CAT12SANLMDenoisingInputSpec(SPMCommandInputSpec):
-    in_file = File(exists=True,
-                   mandatory=True,
-                   desc='Input file')
+    #in_file = File(exists=True,
+    #               mandatory=True,
+    #               desc='Input file')
+    in_files = InputMultiPath(
+        ImageFileSPM(exists=True),
+        field="data",
+        desc="file to segment",
+        mandatory=True,
+        copyfile=False,
+    )
 
-    v = traits.Int(3,
-                   usedefault=True,
-                   desc='size of search volume (M in paper)')
+    intlim = traits.Int(
+                        100,
+                        usedefault=True,
+    )
 
-    f = traits.Int(1,
-                   usedefault=True,
-                   desc='size of neighborhood (d in paper)')
+    addnoise = traits.Float(0.5,
+                            usedefault=True,
+                            desc='strength of additional noise in noise-free regions')
 
-    rician = traits.Bool(0,
+    rician = traits.Int(0,
                          usedefault=True,
                          desc='use rician noise distribution')
 
@@ -48,23 +62,32 @@ class CAT12SANLMDenoising(SPMCommand):
     input_spec = CAT12SANLMDenoisingInputSpec
     output_spec = CAT12SANLMDenoisingOutputSpec
 
-    def _run_interface(self, runtime):
-        d = dict(in_file=self.inputs.in_file,
-                 v=self.inputs.v,
-                 f=self.inputs.f,
-                 rician=self.inputs.rician)
-        script = Template("""in_file= '$in_file';
-                             v = '$v';
-                             f = '$f';
-                             rician = '$rician';
-                             cat_sanlm(in_file, v, f, rician);
-                             exit;
-        """).substitute(d)
-        mlab = MatlabCommand(script=script, mfile=True)
-        result = mlab.run()
-        return result.runtime
+    def __init__(self, **inputs):
+        _local_version = SPMCommand().version
+        if _local_version and "12." in _local_version:
+            self._jobtype = "tools"
+            self._jobname = "cat.tools.sanlm"
+
+        SPMCommand.__init__(self, **inputs)
+
+    def _format_arg(self, opt, spec, val):
+        """Convert input to appropriate format for spm"""
+        if opt == "in_files":
+            if isinstance(val, list):
+                return scans_for_fnames(val)
+            else:
+                return scans_for_fname(val)
+        elif opt in ["intlim", "addnoise", "rician"]:
+            return Cell2Str(val)
+
+        return super(CAT12SANLMDenoising2, self)._format_arg(opt, spec, val)
 
     def _list_outputs(self):
         outputs = self._outputs().get()
-        outputs['out_file'] = os.path.join(os.getcwd(), 'sanlm_' + self.inputs.in_file)
+        outputs['out_file'] = os.path.join(os.getcwd(), 'sanlm_' + self.inputs.in_files[0])
         return outputs
+
+class Cell2Str(Cell):
+    def __str__(self):
+        """Convert input to appropriate format for cat12"""
+        return "{'%s'}" % self.to_string()
