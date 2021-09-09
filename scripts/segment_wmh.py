@@ -51,7 +51,7 @@ def main():
     print(os.getcwd())
     make_dirs()
     wmh = make_workflow()
-    wmh.write_graph(graph2use='colored')
+    #wmh.write_graph(graph2use='colored')
     #Image('./wf_work_dir/wmh/graph.png', width=200)
 
     wmh.run() #Single thread
