@@ -35,7 +35,9 @@ ENV OMP_NUM_THREADS=1
 RUN useradd -m -s /bin/bash -G users wmhpypes
 ENV HOME="/home/wmhpypes"
 # Install WMHpypes
-RUN git clone https://github.com/0rC0/WMHpypes.git $HOME/wmhpypes && \
-    cd $HOME/wmhpypes && \
+RUN git clone https://github.com/0rC0/WMHpypes.git /home/wmhpypes/wmhpypes && \
+    cd /home/wmhpypes/wmhpypes && \
     pip install .
-ENV PATH="$HOME/wmhpypes/scripts":$PATH
+ENV PATH="/home/wmhpypes/wmhpypes/scripts":$PATH
+
+ENTRYPOINT ["/opt/miniconda/bin/python", "/home/wmhpypes/wmhpypes/scripts/segment_wmh.py"]
