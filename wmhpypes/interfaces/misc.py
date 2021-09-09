@@ -20,6 +20,8 @@ from nipype.interfaces.base import (
     BaseInterface,
     InputMultiPath,
     OutputMultiPath,
+    CommandLineInputSpec,
+    CommandLine
 )
 from ..utils.file_utils import add_suffix_to_filename
 
@@ -128,3 +130,21 @@ class ExtractAffine(BaseInterface):
         outputs['out_matrix'] = getattr(self, '_out_matrix')
         outputs['out_file'] = getattr(self, '_out_file')
         return outputs
+
+class GZipInputSpec(CommandLineInputSpec):
+    input_file = File(desc="File", exists=True, mandatory=True, argstr="%s")
+
+
+class GZipOutputSpec(TraitedSpec):
+    output_file = File(desc = "Zip file", exists = True)
+
+
+class GZip(CommandLine):
+    input_spec = GZipInputSpec
+    output_spec = GZipOutputSpec
+    cmd = 'gzip'
+
+    def _list_outputs(self):
+            outputs = self.output_spec().get()
+            outputs['output_file'] = os.path.abspath(self.inputs.input_file + ".gz")
+            return outputs

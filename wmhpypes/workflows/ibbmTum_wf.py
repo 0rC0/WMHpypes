@@ -22,6 +22,7 @@
 # wmh = Workflow(name='wmh', base_dir='./wf')
 # wmh.connect(weights, 'weights', test_wf, 'inputspec.weights')
 # wmh.connect(flair, 'flair', test_wf, 'inputspec.flair')
+# wmh.connect(test_wf, 'outputspec.prediction_nifti', sink, '@pred')
 # wmh.run()
 
 from nipype.pipeline.engine import Workflow, Node
@@ -51,7 +52,7 @@ def get_test_wf(row_st=200,
                                              cols_standard=cols_st,
                                              per=per), name='postprocessing')
     save = Node(interface=SavePrediction(output_filename='prediction'), name='save_prediction')
-    outputspec = Node(interface=IdentityInterface(fields=['prediction_nifti']), name='outputspec')
+    outputspec = Node(interface=IdentityInterface(fields=['wmh_mask']), name='outputspec')
 
     test_wf = Workflow(name='ibbmTum_test_wf')
     test_wf.connect(inputspec, 't1w', preproc, 't1w')
@@ -63,6 +64,6 @@ def get_test_wf(row_st=200,
     test_wf.connect(thresholding, 'out_array', postproc, 'prediction')
     test_wf.connect(inputspec, 'flair', postproc, 'flair')
     test_wf.connect(postproc, 'postprocessed_prediction', save, 'prediction_array')
-    test_wf.connect(save, 'prediction_nifti', outputspec, 'prediction_nifti')
+    test_wf.connect(save, 'prediction_nifti', outputspec, 'wmh_mask')
 
     return test_wf

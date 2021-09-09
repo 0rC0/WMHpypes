@@ -114,8 +114,8 @@ class Preprocessing(BaseInterface):
             imgs_test = self.preprocessing(FLAIR_array, T1_array)
         else:
             imgs_test = self.preprocessing(FLAIR_array)
-        out_arr_name = os.path.join(os.getcwd(), 'preprocessed.npy')
-        np.save(out_arr_name, imgs_test)
+        out_arr_name = 'preprocessed.npy'
+        np.save(os.path.abspath(out_arr_name), imgs_test)
         setattr(self, '_flair_array_npy', out_arr_name)
         setattr(self, '_preprocessed_array', imgs_test)
         setattr(self, '_slice_shape', imgs_test[0].shape)
