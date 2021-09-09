@@ -26,10 +26,9 @@ from nipype.interfaces.spm.base import (
 )
 from nipype.interfaces.cat12.base import Cell
 
+
 class CAT12SANLMDenoisingInputSpec(SPMCommandInputSpec):
-    #in_file = File(exists=True,
-    #               mandatory=True,
-    #               desc='Input file')
+
     in_files = InputMultiPath(
         ImageFileSPM(exists=True),
         field="data",
@@ -58,6 +57,15 @@ class CAT12SANLMDenoisingOutputSpec(TraitedSpec):
 
 
 class CAT12SANLMDenoising(SPMCommand):
+    """
+    Example:
+    =======
+    from wmhpypes.interfaces import cat12
+    c = cat12.CAT12SANLMDenoising()
+    c.inputs.in_files='sub-test_FLAIR.nii'
+    c.inputs.rician = 0
+    c.run()
+    """
 
     input_spec = CAT12SANLMDenoisingInputSpec
     output_spec = CAT12SANLMDenoisingOutputSpec
@@ -84,7 +92,7 @@ class CAT12SANLMDenoising(SPMCommand):
 
     def _list_outputs(self):
         outputs = self._outputs().get()
-        outputs['out_file'] = os.path.join(os.getcwd(), 'sanlm_' + self.inputs.in_files[0])
+        outputs['out_file'] = os.path.join(os.getcwd(), 'sanlm_' + self.inputs.in_files[0].split('/')[-1])
         return outputs
 
 class Cell2Str(Cell):
