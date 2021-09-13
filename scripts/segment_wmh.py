@@ -25,7 +25,9 @@ def make_workflow():
                                  ('_FLAIR.nii.gz/', '/'),]
     sink.inputs.regexp_substitutions = [('\.\..*\.\.', ''),]
 
-    test_wf = ibbmTum_wf.get_test_wf()
+    test_wf = ibbmTum_wf.get_test_wf(row_st=192,
+                                     cols_st=192,
+                                     thres_mask=10)
 
     wmh = Workflow(name='wmh', base_dir=wf_temp)
 
