@@ -362,6 +362,7 @@ class TrainInputSpec(BaseInterfaceInputSpec):
 
     ensemble_parameter = traits.Int(
         3,
+        usedefault=True,
         desc='ensemble parameter'
     )
 
