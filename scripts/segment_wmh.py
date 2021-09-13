@@ -31,7 +31,7 @@ def make_workflow():
 
     wmh.connect(weights_source, 'weights', test_wf, 'inputspec.weights')
     wmh.connect(data_source, 'flairs', test_wf, 'inputspec.flair')
-    wmh.connect(test_wf, 'outputspec.prediction_nifti', sink, '@pred')
+    wmh.connect(test_wf, 'outputspec.wmh_mask', sink, '@pred')
 
     return wmh
 
