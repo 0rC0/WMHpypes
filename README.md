@@ -9,16 +9,31 @@ the winning method in MICCAI 2017 WMH segmentation challenge orginal work reposi
 
 ## Installation
 
+### As a python library 
 ```
 git clone https://github.com/0rC0/WMHpypes.git
 cd WMHpypes
 pip install .
 ```
 
+### As a Docker container
+``` 
+git clone https://github.com/0rC0/WMHpypes.git
+cd WMHpypes
+# for the GPU implementation see also https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker
+docker build -f Dockerfile_gpu -t wmhpypes_gpu .
+```
+
 ## Usage
 
-`ToDo`
+### As a python library
 
+See Jupyter notebooks in the `example` directory
+
+### As a Docker container
+``` 
+docker run -v $PWD:/data --gpus all wmhpypes_gpu:latest -f '/data/test/*' -w '/data/WMHpypes/models/*.h5' -o '/data'
+```
 # Please cite
 If you use the package please cite the original author's [paper](https://arxiv.org/pdf/1802.05203.pdf):
 
