@@ -27,9 +27,7 @@ from ..utils.file_utils import add_suffix_to_filename
 
 
 class SaveNIfTIInputSpec(BaseInterfaceInputSpec):
-    in_array = traits.Either(
-        traits.Array,
-        File(exists=True),
+    in_array = File(exists=True,
         desc='input array as NIfTI or NumPy array')
 
     in_header = File(
@@ -37,14 +35,13 @@ class SaveNIfTIInputSpec(BaseInterfaceInputSpec):
         desc='NIfTI from that the header is taken'
     )
 
-    in_matrix = traits.Either(
-        traits.Array,
-        File(exists=True,
+    in_matrix = File(exists=True,
              desc='NIfTI from that the matrix is taken'
-    ))
+    )
 
     out_filename = traits.Str(
-        mandatory = True,
+        'prediction',
+        usedefault=True,
         desc='output file basename'
     )
 
@@ -62,14 +59,13 @@ class SaveNIfTI(BaseInterface):
         return os.path.join(os.getcwd(), self.inputs.out_filename + '.nii.gz')
 
     def _run_interface(self, runtime):
-        if type(self.inputs.in_array) is str:
-            arr = nib.load(self.inputs.in_array).get_fdata()
-        else:
-            arr = self.inputs.in_array
+
+        arr = nib.load(self.inputs.in_array).get_fdata()
         header = nib.load(self.inputs.in_header).header
+        aff = nib.load(self.inputs.in_matrix).affine
         img = nib.Nifti2Image(arr,
                               header=header,
-                              affine=self.inputs.in_matrix)
+                              affine=aff)
         out_fname = self._gen_output_name()
         #print(type(img))
         #print(out_fname)
