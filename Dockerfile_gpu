@@ -6,8 +6,7 @@ FROM ubuntu:20.04
 RUN apt-get update && \
     apt-get install --yes \
                     curl \
-                    git \
-                    nvidia-container-toolkit
+                    git
 
 # Installing and SetUp MiniConda latest
 RUN curl -sSLO https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
@@ -16,13 +15,14 @@ RUN curl -sSLO https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_6
 ENV PATH="/opt/miniconda/bin:$PATH"
 
 # Install conda environment
-RUN conda install --yes -c pytorch cudatoolkit=11 tensorflow-gpu
 RUN conda install --yes  -c conda-forge scipy \
                                         keras \
                                         numpy \
                                         nibabel \
                                         nipype \
+                                        cudatoolkit=11 \
                                         simpleitk && \
+        conda install --yes -c anaconda  tensorflow-gpu && \
         chmod -R a+rX /opt/miniconda; sync && \
         chmod +x /opt/miniconda/bin/*; sync && \
         conda build purge-all; sync && \
