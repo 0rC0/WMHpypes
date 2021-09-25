@@ -111,9 +111,9 @@ class Preprocessing(BaseInterface):
 
         if self.inputs.t1w:
             T1_array = sitk.GetArrayFromImage(sitk.ReadImage(self.inputs.t1w))
-            imgs_test = self.preprocessing(FLAIR_array, T1_array)
+            imgs_test = self.preprocessing(FLAIR_array.astype(np.float32), T1_array.astype(np.float32))
         else:
-            imgs_test = self.preprocessing(FLAIR_array)
+            imgs_test = self.preprocessing(FLAIR_array.astype(np.float32))
         out_arr_name = 'preprocessed.npy'
         np.save(os.path.abspath(out_arr_name), imgs_test)
         setattr(self, '_flair_array_npy', out_arr_name)
