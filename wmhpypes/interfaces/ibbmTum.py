@@ -383,7 +383,10 @@ class TrainInputSpec(BaseInterfaceInputSpec):
         usedefault=True,
         desc='epochs, default 5'
     )
-
+    image_shape = traits.Tuple(
+        (traits.Int(), traits.Int(), traits.Int()),
+        desc='slice shape'
+    )
 
 class TrainOutputSpec(TraitedSpec):
 
@@ -398,20 +401,27 @@ class Train(BaseInterface):
     input_spec = TrainInputSpec
     output_spec = TrainOutputSpec
 
-    def train(self):
-
+    def __train(self):
+        import tensorflow as tf
+        #from tf.keras.callbacks import ModelCheckpoint
         model_name = 'model_'
         models_list = list()
         for iiii in range(self.inputs.ensemble_parameter):
             model_file=model_name + str(iiii) + '.h5'
-            model = get_unet(img_shape)
-            model_checkpoint = ModelCheckpoint(model_file,
+            model = get_unet(self.inputs.image_shape)
+            model_checkpoint = tf.keras.callbacks.ModelCheckpoint(model_file,
                                                save_best_only=False,
                                                period = 2)
-            model.fit(self.inputs.images,
-                      self.inputs.masks,
+            print(np.array(self.inputs.images).shape)
+            print(np.array(self.inputs.masks).shape)
+            images = np.concatenate(self.inputs.images)
+            masks = np.concatenate(self.inputs.masks)
+            print(masks.shape)
+            print(images.shape)
+            model.fit(images,
+                      masks,
                       batch_size=self.inputs.batch_size,
-                      nb_epoch= self.inputs.epochs,
+                      epochs= self.inputs.epochs,
                       verbose=self.inputs.verbose,
                       shuffle=True,
                       validation_split=0.0,
@@ -421,8 +431,9 @@ class Train(BaseInterface):
         return models_list
 
     def _run_interface(self, runtime):
-        weights = train()
+        weights = self.__train()
         setattr(self, '_weights', weights)
+        return runtime
 
     def _list_outputs(self):
         outputs = self._outputs().get()

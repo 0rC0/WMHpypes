@@ -17,6 +17,7 @@ from tensorflow.keras.optimizers import Adam
 #from evaluation import getDSC, getHausdorff, getLesionDetection, getAVD, getImages
 
 
+smooth=1.
 
 def get_crop_shape(target, refer):
 
@@ -112,7 +113,7 @@ def get_unet(img_shape=None, first5=True):
     conv9 = ZeroPadding2D(padding=(ch, cw))(conv9)
     conv10 = Conv2D(1, 1, activation='sigmoid', padding='same')(conv9)  # , kernel_initializer='he_normal'
     model = Model(inputs=inputs, outputs=conv10)
-    model.compile(optimizer=Adam(lr=(2e-4)), loss=dice_coef_loss)
+    model.compile(optimizer=Adam(lr=(2e-4)), loss=dice_coef_loss, metrics=[dice_coef_for_training])
 
     return model
 
