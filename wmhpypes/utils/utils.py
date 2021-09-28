@@ -54,15 +54,11 @@ def dice_coef_for_training(y_true, y_pred):
 def dice_coef_loss(y_true, y_pred):
     return 1.-dice_coef_for_training(y_true, y_pred)
 
-def get_unet(img_shape=None, first5=True):
+def get_unet(img_shape=None, filters = 5):
 
     inputs = Input(shape=img_shape)
     concat_axis = -1
 
-    if first5:
-        filters = 5
-    else:
-        filters = 3
     conv1 = conv_bn_relu(64, filters, inputs)
     conv1 = conv_bn_relu(64, filters, conv1)
     pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)

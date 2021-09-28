@@ -388,6 +388,11 @@ class TrainInputSpec(BaseInterfaceInputSpec):
         desc='slice shape'
     )
 
+    shuffle = traits.Bool(
+        True,
+        desc='shuffle'
+    )
+
 class TrainOutputSpec(TraitedSpec):
 
     weights = traits.List(
@@ -408,24 +413,39 @@ class Train(BaseInterface):
         models_list = list()
         for iiii in range(self.inputs.ensemble_parameter):
             model_file=model_name + str(iiii) + '.h5'
-            model = get_unet(self.inputs.image_shape)
-            model_checkpoint = tf.keras.callbacks.ModelCheckpoint(model_file,
-                                               save_best_only=False,
-                                               period = 2)
-            print(np.array(self.inputs.images).shape)
-            print(np.array(self.inputs.masks).shape)
+            model = get_unet(self.inputs.image_shape, 3)
+            # model_checkpoint = tf.keras.callbacks.ModelCheckpoint(model_file,
+            #                                   save_best_only=False,
+            #                                   period = 2)
             images = np.concatenate(self.inputs.images)
             masks = np.concatenate(self.inputs.masks)
-            print(masks.shape)
-            print(images.shape)
-            model.fit(images,
-                      masks,
-                      batch_size=self.inputs.batch_size,
-                      epochs= self.inputs.epochs,
-                      verbose=self.inputs.verbose,
-                      shuffle=True,
-                      validation_split=0.0,
-                      callbacks=[model_checkpoint])
+            current_epoch = 1
+            while current_epoch <= self.inputs.epochs:
+                print('Epoch ', str(current_epoch), '/', str(self.inputs.epochs))
+                history = model.fit(images,
+                                    masks,
+                                    batch_size=self.inputs.batch_size,
+                                    epochs=1,
+                                    verbose=self.inputs.verbose,
+                                    shuffle=self.inputs.shuffle)
+                #                   callbacks = [model_checkpoint]
+                current_epoch += 1
+                if history.history['loss'][-1] > 0.99:  # if the model get stuck, restart it.
+                    model = get_unet(self.inputs.image_shape, 3)
+                    current_epoch = 1
+                if history.history['loss'][-1] < 0.30:
+                    model.save_weights(model_file)
+                    print('Model saved to ', model_file)
+                    break
+
+            # model.fit(images,
+            #           masks,
+            #           batch_size=self.inputs.batch_size,
+            #           epochs= self.inputs.epochs,
+            #           verbose=self.inputs.verbose,
+            #           shuffle=True,
+            #           validation_split=0.0,
+            #           callbacks=[model_checkpoint])
             model.save(model_file)
             models_list.append(os.path.join(os.getcwd(),model_file))
         return models_list
