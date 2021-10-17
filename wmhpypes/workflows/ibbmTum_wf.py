@@ -30,6 +30,7 @@ from nipype import DataGrabber, DataSink, IdentityInterface, MapNode, JoinNode
 from nipype.interfaces.io import BIDSDataGrabber
 from nipype.interfaces.utility import Function, Merge
 import os
+from ..interfaces import misc
 from ..interfaces.ibbmTum import Preprocessing, Predict, Postprocessing, SavePrediction, Ensemble, Thresholding
 
 
@@ -51,8 +52,14 @@ def get_test_wf(row_st=200,
     postproc = Node(interface=Postprocessing(rows_standard=row_st,
                                              cols_standard=cols_st,
                                              per=per), name='postprocessing')
+    postproc_pm = Node(interface=Postprocessing(rows_standard=row_st,
+                                             cols_standard=cols_st,
+                                             per=per), name='postprocessing_probability_map')
     save = Node(interface=SavePrediction(output_filename='prediction'), name='save_prediction')
-    outputspec = Node(interface=IdentityInterface(fields=['wmh_mask']), name='outputspec')
+    save_nii = Node(interface=misc.SaveNIfTI(out_filename='prediction'), name='save_nii')
+    save_pm = Node(interface=SavePrediction(output_filename='probability_map'), name='save_prediction_probability_map')
+    save_nii_pm = Node(interface=misc.SaveNIfTI(out_filename='probability_map'), name='save_nii_pm')
+    outputspec = Node(interface=IdentityInterface(fields=['wmh_mask', 'wmh_probability_map']), name='outputspec')
 
     test_wf = Workflow(name='ibbmTum_test_wf')
     test_wf.connect(inputspec, 't1w', preproc, 't1w')
@@ -64,6 +71,18 @@ def get_test_wf(row_st=200,
     test_wf.connect(thresholding, 'out_array', postproc, 'prediction')
     test_wf.connect(inputspec, 'flair', postproc, 'flair')
     test_wf.connect(postproc, 'postprocessed_prediction', save, 'prediction_array')
-    test_wf.connect(save, 'prediction_nifti', outputspec, 'wmh_mask')
+    test_wf.connect(save, 'prediction_nifti', save_nii, 'in_array')
+    test_wf.connect(inputspec, 'flair', save_nii, 'in_header')
+    test_wf.connect(inputspec, 'flair', save_nii, 'in_matrix')
+    test_wf.connect(save_nii, 'out_file', outputspec, 'wmh_mask')
+    # Probability map as output
+    test_wf.connect(predict, 'prediction', postproc_pm, 'prediction')
+    test_wf.connect(inputspec, 'flair', postproc_pm, 'flair')
+    test_wf.connect(predict, 'prediction', save_pm, 'prediction_array')
+    test_wf.connect(save_pm, 'prediction_nifti', save_nii_pm, 'in_array')
+    test_wf.connect(inputspec, 'flair', save_nii_pm, 'in_header')
+    test_wf.connect(inputspec, 'flair', save_nii_pm, 'in_matrix')
+    test_wf.connect(save_nii_pm, 'out_file', outputspec, 'wmh_probability_map')
+
 
     return test_wf

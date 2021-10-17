@@ -40,7 +40,7 @@ class SaveNIfTIInputSpec(BaseInterfaceInputSpec):
     )
 
     out_filename = traits.Str(
-        'prediction',
+        'out_nii',
         usedefault=True,
         desc='output file basename'
     )
