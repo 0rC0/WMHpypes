@@ -78,7 +78,7 @@ def get_test_wf(row_st=200,
     # Probability map as output
     test_wf.connect(predict, 'prediction', postproc_pm, 'prediction')
     test_wf.connect(inputspec, 'flair', postproc_pm, 'flair')
-    test_wf.connect(predict, 'prediction', save_pm, 'prediction_array')
+    test_wf.connect(postproc_pm, 'postprocessed_prediction', save_pm, 'prediction_array')
     test_wf.connect(save_pm, 'prediction_nifti', save_nii_pm, 'in_array')
     test_wf.connect(inputspec, 'flair', save_nii_pm, 'in_header')
     test_wf.connect(inputspec, 'flair', save_nii_pm, 'in_matrix')
