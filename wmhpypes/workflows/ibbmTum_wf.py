@@ -64,6 +64,9 @@ def get_test_wf(row_st=200,
     test_wf = Workflow(name='ibbmTum_test_wf')
     test_wf.connect(inputspec, 't1w', preproc, 't1w')
     test_wf.connect(inputspec, 'flair', preproc, 'flair')
+    # if the models are not given, use the default ones
+    if not inputspec.inputs.weights:
+        inputspec.inputs.weights = [i for i in os.listdir('../models') if i.endswith('.h5')]
     test_wf.connect(inputspec, 'weights', predict, 'weights')
     test_wf.connect(preproc, 'preprocessed_array', predict, 'preprocessed_array')
     test_wf.connect(preproc, 'slice_shape', predict, 'slice_shape')

@@ -3,12 +3,12 @@ import sys, os, importlib
 try:
     from wmhpypes.interfaces import ibbmTum
     from wmhpypes.workflows import ibbmTum_wf
-    from wmhpypes.interfaces import cat12
+    from nipype.interfaces import cat12
 except:
     sys.path.append(os.path.abspath('../'))
     from wmhpypes.interfaces import ibbmTum
     from wmhpypes.workflows import ibbmTum_wf
-    from wmhpypes.interfaces import cat12
+    from nipype.interfaces import cat12
 
 from nipype import (DataGrabber,
                     DataSink,
