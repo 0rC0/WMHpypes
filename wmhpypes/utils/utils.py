@@ -17,7 +17,6 @@ from tensorflow.keras.optimizers import Adam
 #from evaluation import getDSC, getHausdorff, getLesionDetection, getAVD, getImages
 
 
-smooth=1.
 
 def get_crop_shape(target, refer):
 
@@ -54,11 +53,15 @@ def dice_coef_for_training(y_true, y_pred):
 def dice_coef_loss(y_true, y_pred):
     return 1.-dice_coef_for_training(y_true, y_pred)
 
-def get_unet(img_shape=None, filters = 5):
+def get_unet(img_shape=None, first5=True):
 
     inputs = Input(shape=img_shape)
     concat_axis = -1
 
+    if first5:
+        filters = 5
+    else:
+        filters = 3
     conv1 = conv_bn_relu(64, filters, inputs)
     conv1 = conv_bn_relu(64, filters, conv1)
     pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
@@ -109,27 +112,6 @@ def get_unet(img_shape=None, filters = 5):
     conv9 = ZeroPadding2D(padding=(ch, cw))(conv9)
     conv10 = Conv2D(1, 1, activation='sigmoid', padding='same')(conv9)  # , kernel_initializer='he_normal'
     model = Model(inputs=inputs, outputs=conv10)
-    model.compile(optimizer=Adam(lr=(2e-4)), loss=dice_coef_loss, metrics=[dice_coef_for_training])
+    model.compile(optimizer=Adam(lr=(2e-4)), loss=dice_coef_loss)
 
     return model
-
-
-def augmentation(x_0, x_1, y):
-    theta = (np.random.uniform(-15, 15) * np.pi) / 180.
-    rotation_matrix = np.array([[np.cos(theta), -np.sin(theta), 0],
-                                [np.sin(theta), np.cos(theta), 0],
-                                [0, 0, 1]])
-    shear = np.random.uniform(-.1, .1)
-    shear_matrix = np.array([[1, -np.sin(shear), 0],
-                             [0, np.cos(shear), 0],
-                             [0, 0, 1]])
-    zx, zy = np.random.uniform(.9, 1.1, 2)
-    zoom_matrix = np.array([[zx, 0, 0],
-                            [0, zy, 0],
-                            [0, 0, 1]])
-    augmentation_matrix = np.dot(np.dot(rotation_matrix, shear_matrix), zoom_matrix)
-    transform_matrix = transform_matrix_offset_center(augmentation_matrix, x_0.shape[0], x_0.shape[1])
-    x_0 = apply_transform(x_0[..., np.newaxis], transform_matrix, channel_axis=2)
-    x_1 = apply_transform(x_1[..., np.newaxis], transform_matrix, channel_axis=2)
-    y = apply_transform(y[..., np.newaxis], transform_matrix, channel_axis=2)
-    return x_0[..., 0], x_1[..., 0], y[..., 0]

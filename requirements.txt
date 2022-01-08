@@ -1,7 +1,8 @@
-tensorflow~=2.6.0
-scipy~=1.6.3
+tensorflow
+scipy
 keras~=2.6.0
-numpy~=1.19.1
-nibabel~=3.2.1
-nipype~=1.6.0
-simpleitk~=2.0.2
+numpy
+nibabel
+nipype~=1.7.0
+scikit-build
+SimpleITK

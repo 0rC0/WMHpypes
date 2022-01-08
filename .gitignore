@@ -136,3 +136,8 @@ test_data/
 
 #Pycharm project dir
 .idea
+
+# Temporary files test workflow
+/examples/test_dataset/
+/examples/imgs/
+/examples/tmp/

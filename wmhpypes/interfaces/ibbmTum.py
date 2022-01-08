@@ -111,9 +111,9 @@ class Preprocessing(BaseInterface):
 
         if self.inputs.t1w:
             T1_array = sitk.GetArrayFromImage(sitk.ReadImage(self.inputs.t1w))
-            imgs_test = self.preprocessing(FLAIR_array.astype(np.float32), T1_array.astype(np.float32))
+            imgs_test = self.preprocessing(FLAIR_array, T1_array)
         else:
-            imgs_test = self.preprocessing(FLAIR_array.astype(np.float32))
+            imgs_test = self.preprocessing(FLAIR_array)
         out_arr_name = 'preprocessed.npy'
         np.save(os.path.abspath(out_arr_name), imgs_test)
         setattr(self, '_flair_array_npy', out_arr_name)
@@ -342,6 +342,7 @@ class Thresholding(BaseInterface):
         outputs = self._outputs().get()
         outputs['out_array'] = getattr(self, '_out_array')
         return outputs
+
 
 class TrainInputSpec(BaseInterfaceInputSpec):
 
