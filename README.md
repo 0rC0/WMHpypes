@@ -6,7 +6,6 @@ Nipype implementation of WMH segmentation pipelines.
 * ###  sysu_media
 the winning method in MICCAI 2017 WMH segmentation challenge orginal work repository: ([wmh_ibbmTum](https://github.com/hongweilibran/wmh_ibbmTum))
 
-
 ## Installation
 
 ### As a python library (pip)
@@ -21,11 +20,10 @@ pip install .
 
 ### As a python library (anaconda)
 ```
-conda create -n wmhpypes -c conda-forge pip
-conda activate wmhpypes
 git clone https://github.com/0rC0/WMHpypes.git
 cd WMHpypes
-pip install -r requirements.txt
+conda env create -f conda_env_cpu.yml
+conda activate wmhpypes
 pip install .
 ```
 
@@ -41,12 +39,13 @@ docker build -f Dockerfile_gpu -t wmhpypes_gpu .
 
 ### As a python library
 
-See Jupyter notebooks in the `example` directory
+See `Quickstart` Jupyter notebooks in the `example` directory
 
 ### As a Docker container
 ``` 
 docker run -v $PWD:/data --gpus all wmhpypes_gpu:latest -f '/data/test/*' -w '/data/WMHpypes/models/*.h5' -o '/data'
 ```
+
 # Please cite
 If you use the package please cite the original author's [paper](https://arxiv.org/pdf/1802.05203.pdf):
 
