@@ -5,5 +5,12 @@
       "name": "Dell'Orco, Andrea",
       "orcid": "0000-0002-3964-8360"
     }
-  ]
+  ],
+    "keywords": [
+    "neuroimaging",
+    "segmentation",
+    "white matter hyperintensities"
+    ],
+  "license": "BSD 3-Clause License",
+  "upload_type": "software"
 }
