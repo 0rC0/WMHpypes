@@ -43,9 +43,9 @@ def get_test_wf(row_st=200,
     preproc = Node(interface=Preprocessing(rows_standard=row_st,
                                            cols_standard=cols_st,
                                            thres=thres_mask), name='preprocessing')
-    predict = Node(interface=Predict(), name='predict')
-    predict.interface._nprocs = cores
-    predict.interface._memgb = 1
+    predict = Node(interface=Predict(), name='predict',
+                                        n_procs=cores,
+                                        mem_gb = 2)
     thresholding = Node(interface=Thresholding(thres=thres_pred), name='thresholding')
     postproc = Node(interface=Postprocessing(rows_standard=row_st,
                                              cols_standard=cols_st,
