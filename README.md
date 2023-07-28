@@ -49,7 +49,8 @@ docker run -v $PWD:/data --gpus all wmhpypes_gpu:latest -f '/data/test/*' -w '/d
 # Please cite
 If you use the package please cite the original author's [paper](https://arxiv.org/pdf/1802.05203.pdf):
 
-* ### sysu_media
 ```
+Gaubert, M., Dell’Orco, A., Lange, C., Garnier-Crussard, A., Zimmermann, I., Dyrba, M., ... & Max, K. (2023). Performance evaluation of automated white matter hyperintensity segmentation algorithms in a multicenter cohort on cognitive impairment and dementia. Frontiers in psychiatry, 13, 1010273.
+
 Li, Hongwei & Jiang, Gongfa & Wang, Ruixuan & Zhang, Jianguo & Wang, Zhaolei & Zheng, Wei-Shi & Menze, Bjoern. (2018). Fully Convolutional Network Ensembles for White Matter Hyperintensities Segmentation in MR Images. NeuroImage. 183. 10.1016/j.neuroimage.2018.07.005. 
 ```
